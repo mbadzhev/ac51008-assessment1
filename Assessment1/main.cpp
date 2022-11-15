@@ -233,7 +233,7 @@ void display()
 	model.pop();
 
 	// Define the global model transformations (rotate and scale). Note, we're not modifying the light source position
-	//model.top() = scale(model.top(), vec3(model_scale, model_scale, model_scale));
+	model.top() = scale(model.top(), vec3(model_scale, model_scale, model_scale));
 	model.top() = rotate(model.top(), -radians(angle_x), glm::vec3(1, 0, 0)); //rotating in clockwise direction around x-axis
 	model.top() = rotate(model.top(), -radians(angle_y), glm::vec3(0, 1, 0)); //rotating in clockwise direction around y-axis
 	model.top() = rotate(model.top(), -radians(angle_z), glm::vec3(0, 0, 1)); //rotating in clockwise direction around z-axis
@@ -243,7 +243,7 @@ void display()
 	{
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(base_x, base_y, base_z));
-		model.top() = scale(model.top(), vec3(model_scale, base_scale_y, model_scale));
+		model.top() = scale(model.top(), vec3(base_scale_x, base_scale_y, base_scale_z));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
 		glUniformMatrix4fv(modelID[current_program], 1, GL_FALSE, &(model.top()[0][0]));
