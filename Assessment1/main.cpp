@@ -60,7 +60,6 @@ Cube headCube;
 Sphere rotorSphere;
 Cube blade1Cube;
 Cube blade2Cube;
-Cube blade3Cube;
 
 /* Position of primitives */
 GLfloat base_x, base_y, base_z;
@@ -76,6 +75,10 @@ GLfloat body_scale_x, body_scale_y, body_scale_z;
 GLfloat head_scale_x, head_scale_y, head_scale_z;
 GLfloat rotor_scale_x, rotor_scale_y, rotor_scale_z;
 GLfloat blade_scale_x, blade_scale_y, blade_scale_z;
+
+/* Rotation of primitives */
+GLfloat rotation_z;
+GLfloat rotation_inc_z;
 
 /*
 This function is called before entering the main rendering loop.
@@ -103,14 +106,17 @@ void init(GLWrapper* glw)
 	body_x = 0; body_y = 0.5f; body_z = 0;
 	head_x = 0; head_y = 1.f; head_z = 0;
 	rotor_x = 0; rotor_y = 1.f; rotor_z = 0.25f;
-	blade1_x = 0; blade1_y = 1.3f; blade1_z = 0.3f;
-	blade2_x = 0; blade2_y = 0.7f; blade2_z = 0.3;
+	blade1_x = 0; blade1_y = 1.f; blade1_z = 0.3f;
+	blade2_x = 0; blade2_y = 1.f; blade2_z = 0.3;
 	
 	base_scale_x = 1.f; base_scale_y = 0.1f; base_scale_z = 1.f;
 	body_scale_x = 0.5f; body_scale_y = 2.f; body_scale_z = 0.5f;
 	head_scale_x = 0.6f; head_scale_y = 0.5f; head_scale_z = 0.9f;
 	rotor_scale_x = 0.12f; rotor_scale_y = 0.12f; rotor_scale_z = 0.2f;
-	blade_scale_x = 0.15f; blade_scale_y = 1.f; blade_scale_z = 0.05f;
+	blade_scale_x = 0.15f; blade_scale_y = 2.f; blade_scale_z = 0.05f;
+
+	rotation_z = 0;
+	rotation_inc_z = 0;
 
 	// Generate index (name) for one vertex array object
 	glGenVertexArrays(1, &vao);
@@ -290,10 +296,11 @@ void display()
 	model.pop();
 
 
-	// This block of code draws the sphere
+	// This block of code draws the rotor sphere
 	model.push(model.top());
 	{
 		model.top() = translate(model.top(), vec3(rotor_x, rotor_y, rotor_z));
+		model.top() = rotate(model.top(), radians(rotation_z), glm::vec3(0, 0, 1));
 		model.top() = scale(model.top(), vec3(rotor_scale_x, rotor_scale_y, rotor_scale_z));
 
 		// Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
@@ -310,6 +317,7 @@ void display()
 	{
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(blade1_x, blade1_y, blade1_z));
+		model.top() = rotate(model.top(), radians(rotation_z), glm::vec3(0, 0, 1));
 		model.top() = scale(model.top(), vec3(blade_scale_x, blade_scale_y, blade_scale_z));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
@@ -329,6 +337,7 @@ void display()
 	{
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(blade2_x, blade2_y, blade2_z));
+		model.top() = rotate(model.top(), radians(90.f + rotation_z), glm::vec3(0, 0, 1));
 		model.top() = scale(model.top(), vec3(blade_scale_x, blade_scale_y, blade_scale_z));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
@@ -351,6 +360,7 @@ void display()
 	angle_x += angle_inc_x;
 	angle_y += angle_inc_y;
 	angle_z += angle_inc_z;
+	rotation_z += rotation_inc_z;
 }
 
 /* Called whenever the window is resized. The new window size is given, in pixels. */
@@ -395,6 +405,10 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == '0') vy += 1.f;
 	if (key == 'O') vz -= 1.f;
 	if (key == 'P') vz += 1.f;
+
+	/* Control rotor and blade rotation */
+	if (key == 'L') rotation_inc_z -= 0.1f;
+	if (key == 'K') rotation_inc_z += 0.1f;
 
 	/* Switch colour mode */
 	if (key == 'M' && action != GLFW_PRESS)
