@@ -142,6 +142,7 @@
     <None Include="shaders\fraglight.frag" />
     <None Include="shaders\fraglight.vert" />
     <None Include="shaders\fraglight_oren_nayar.frag" />
+    <None Include="shaders\phong.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="objects\cube.h" />
