@@ -35,12 +35,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fraglight.frag">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="shaders\fraglight.vert">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="shaders\fraglight_oren_nayar.frag">
       <Filter>Source Files</Filter>
     </None>
