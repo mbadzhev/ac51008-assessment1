@@ -58,8 +58,7 @@ Cube baseCube;
 Cube bodyCube;
 Cube headCube;
 Sphere rotorSphere;
-Cube blade1Cube;
-Cube blade2Cube;
+Cube bladeCube;
 
 /* Position of primitives */
 GLfloat base_x, base_y, base_z;
@@ -127,9 +126,8 @@ void init(GLWrapper* glw)
 	/* Load and build the vertex and fragment shaders */
 	try
 	{
-		program[0] = glw->LoadShader("shaders\\poslight.vert", "shaders\\poslight.frag");
-		program[1] = glw->LoadShader("shaders\\fraglight.vert", "shaders\\fraglight.frag");
-		program[2] = glw->LoadShader("shaders\\fraglight.vert", "shaders\\fraglight_oren_nayar.frag");
+		program[0] = glw->LoadShader("shaders\\fraglight.vert", "shaders\\fraglight.frag");
+		program[1] = glw->LoadShader("shaders\\fraglight.vert", "shaders\\fraglight_oren_nayar.frag");
 	}
 	catch (exception& e)
 	{
@@ -159,7 +157,7 @@ void init(GLWrapper* glw)
 	bodyCube.makeCube();
 	headCube.makeCube();
 	rotorSphere.makeSphere(numlats, numlongs);
-	blade1Cube.makeCube();
+	bladeCube.makeCube();
 }
 
 /* Called to update the display. Note that this function is called in the event loop in the wrapper
@@ -328,7 +326,7 @@ void display()
 		glUniformMatrix3fv(normalmatrixID[current_program], 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
-		blade1Cube.drawCube(drawmode);
+		bladeCube.drawCube(drawmode);
 	}
 	model.pop();
 
@@ -348,7 +346,7 @@ void display()
 		glUniformMatrix3fv(normalmatrixID[current_program], 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
-		blade1Cube.drawCube(drawmode);
+		bladeCube.drawCube(drawmode);
 	}
 	model.pop();
 

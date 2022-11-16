@@ -21,9 +21,6 @@
     <ClCompile Include="..\common\wrapper_glfw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fraglight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="objects\cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -31,6 +28,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="objects\sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -42,12 +42,6 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="shaders\fraglight_oren_nayar.frag">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="shaders\poslight.frag">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="shaders\poslight.vert">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
