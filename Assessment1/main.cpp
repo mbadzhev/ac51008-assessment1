@@ -449,6 +449,17 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	}
 }
 
+void displayControls()
+{
+	cout << "Camera Controls" << endl;
+	cout << "Rotate Camera Right: right arrow" << endl;
+	cout << "Rotate Camera Left: left arrow" << endl;
+	cout << "Move Camera Up: up arrow" << endl;
+	cout << "Move Camera Down: down arrow" << endl;
+	cout << "Zoom Camera In: plus" << endl;
+	cout << "Zoom Camera Out: minus" << endl;
+}
+
 /* Entry point of program */
 int main(int argc, char* argv[])
 {
@@ -467,6 +478,8 @@ int main(int argc, char* argv[])
 	glw->setReshapeCallback(reshape);
 
 	init(glw);
+
+	displayControls();
 
 	glw->eventLoop();
 
