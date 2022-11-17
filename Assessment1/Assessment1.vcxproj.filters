@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Objects">
+      <UniqueIdentifier>{2db534d4-a666-426c-adb8-3d60e9c87df9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{dfbf1cee-aac0-446d-9a2b-19edc9cc0c35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\glad.c">
@@ -21,45 +27,39 @@
     <ClCompile Include="..\common\wrapper_glfw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fraglight.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="objects\cube.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="objects\cylinder.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="objects\sphere.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fraglight.frag">
-      <Filter>Source Files</Filter>
+    <None Include="shaders\phong.vert">
+      <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\fraglight.vert">
-      <Filter>Source Files</Filter>
+    <None Include="shaders\phong.frag">
+      <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\fraglight_oren_nayar.frag">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="shaders\poslight.frag">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="shaders\poslight.vert">
-      <Filter>Source Files</Filter>
+    <None Include="shaders\oren_nayar.frag">
+      <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="objects\cube.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="objects\cylinder.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="objects\sphere.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -25,10 +25,10 @@ if you prefer */
 using namespace std;
 using namespace glm;
 
-const int NUM_PROGRAMS = 3;
+/* Identifiers for the shader programs */
+GLuint program_phong;
+GLuint program_oren_nayar;
 
-GLuint program[NUM_PROGRAMS];		/* Identifiers for the shader prgorams */
-GLuint current_program;
 GLuint vao;			/* Vertex array (Containor) object. This is the index of the VAO that will be the container for
 					   our buffer objects */
 
@@ -39,7 +39,7 @@ GLuint emitmode;
 GLuint attenuationmode;
 
 /* Position and view globals */
-GLfloat angle_x, angle_inc_x, x, model_scale, z, y, vx, vy, vz;
+GLfloat angle_x, angle_inc_x, model_scale, vx, vy, vz;
 GLfloat angle_y, angle_inc_y, angle_z, angle_inc_z;
 GLuint drawmode;			// Defines drawing mode of sphere as points, lines or filled polygons
 GLuint numlats, numlongs;	//Define the resolution of the sphere object
@@ -47,8 +47,11 @@ GLuint numlats, numlongs;	//Define the resolution of the sphere object
 GLfloat light_x, light_y, light_z;
 
 /* Uniforms*/
-GLuint modelID[NUM_PROGRAMS], viewID[NUM_PROGRAMS], projectionID[NUM_PROGRAMS], lightposID[NUM_PROGRAMS], normalmatrixID[NUM_PROGRAMS];
-GLuint colourmodeID[NUM_PROGRAMS], emitmodeID[NUM_PROGRAMS], attenuationmodeID[NUM_PROGRAMS];
+GLuint phong_modelID, phong_viewID, phong_projectionID, phong_lightposID, phong_normalmatrixID;
+GLuint phong_colourmodeID, phong_emitmodeID, phong_attenuationmodeID;
+/* Uniforms*/
+GLuint oren_nayar_modelID, oren_nayar_viewID, oren_nayar_projectionID, oren_nayar_lightposID, oren_nayar_normalmatrixID;
+GLuint oren_nayar_colourmodeID, oren_nayar_emitmodeID, oren_nayar_attenuationmodeID;
 
 GLfloat aspect_ratio;		/* Aspect ratio of the window defined in the reshape callback*/
 GLuint numspherevertices;
@@ -58,8 +61,7 @@ Cube baseCube;
 Cube bodyCube;
 Cube headCube;
 Sphere rotorSphere;
-Cube blade1Cube;
-Cube blade2Cube;
+Cube bladeCube;
 
 /* Position of primitives */
 GLfloat base_x, base_y, base_z;
@@ -87,11 +89,8 @@ Use it for all your initialisation stuff
 void init(GLWrapper* glw)
 {
 	/* Set the object transformation controls to their initial values */
-	x = 0.05f;
-	y = 0;
-	z = 0;
 	vx = 0; vx = 0, vz = 4.f;
-	light_x = 0; light_y = 0; light_z = 0;
+	light_x = 2; light_y = 2; light_z = 2;
 	angle_x = angle_y = angle_z = 0;
 	angle_inc_x = angle_inc_y = angle_inc_z = 0; const float roughness = 0.8;
 	model_scale = 1.f;
@@ -108,7 +107,7 @@ void init(GLWrapper* glw)
 	rotor_x = 0; rotor_y = 1.f; rotor_z = 0.25f;
 	blade1_x = 0; blade1_y = 1.f; blade1_z = 0.3f;
 	blade2_x = 0; blade2_y = 1.f; blade2_z = 0.3;
-	
+
 	base_scale_x = 1.f; base_scale_y = 0.1f; base_scale_z = 1.f;
 	body_scale_x = 0.5f; body_scale_y = 2.f; body_scale_z = 0.5f;
 	head_scale_x = 0.6f; head_scale_y = 0.5f; head_scale_z = 0.9f;
@@ -127,9 +126,8 @@ void init(GLWrapper* glw)
 	/* Load and build the vertex and fragment shaders */
 	try
 	{
-		program[0] = glw->LoadShader("shaders\\poslight.vert", "shaders\\poslight.frag");
-		program[1] = glw->LoadShader("shaders\\fraglight.vert", "shaders\\fraglight.frag");
-		program[2] = glw->LoadShader("shaders\\fraglight.vert", "shaders\\fraglight_oren_nayar.frag");
+		program_phong = glw->LoadShader("shaders\\phong.vert", "shaders\\phong.frag");
+		program_oren_nayar = glw->LoadShader("shaders\\phong.vert", "shaders\\oren_nayar.frag");
 	}
 	catch (exception& e)
 	{
@@ -138,28 +136,33 @@ void init(GLWrapper* glw)
 		exit(0);
 	}
 
-	/* Define the same uniforms to send to both shaders */
-	for (int i = 0; i < NUM_PROGRAMS; i++)
-	{
-		glUseProgram(program[i]);
-		modelID[i] = glGetUniformLocation(program[i], "model");
-		colourmodeID[i] = glGetUniformLocation(program[i], "colourmode");
-		emitmodeID[i] = glGetUniformLocation(program[i], "emitmode");
-		attenuationmodeID[i] = glGetUniformLocation(program[i], "attenuationmode");
-		viewID[i] = glGetUniformLocation(program[i], "view");
-		projectionID[i] = glGetUniformLocation(program[i], "projection");
-		lightposID[i] = glGetUniformLocation(program[i], "lightpos");
-		normalmatrixID[i] = glGetUniformLocation(program[i], "normalmatrix");
-	}
-	// Define the index which represents the current shader (i.e. default is gouraud)
-	current_program = 0;
+	/* Define the uniforms to send to the shaders */
+	glUseProgram(program_phong);
+	phong_modelID = glGetUniformLocation(program_phong, "model");
+	phong_colourmodeID = glGetUniformLocation(program_phong, "colourmode");
+	phong_emitmodeID = glGetUniformLocation(program_phong, "emitmode");
+	phong_attenuationmodeID = glGetUniformLocation(program_phong, "attenuationmode");
+	phong_viewID = glGetUniformLocation(program_phong, "view");
+	phong_projectionID = glGetUniformLocation(program_phong, "projection");
+	phong_lightposID = glGetUniformLocation(program_phong, "lightpos");
+	phong_normalmatrixID = glGetUniformLocation(program_phong, "normalmatrix");
+
+	glUseProgram(program_oren_nayar);
+	oren_nayar_modelID = glGetUniformLocation(program_oren_nayar, "model");
+	oren_nayar_colourmodeID = glGetUniformLocation(program_oren_nayar, "colourmode");
+	oren_nayar_emitmodeID = glGetUniformLocation(program_oren_nayar, "emitmode");
+	oren_nayar_attenuationmodeID = glGetUniformLocation(program_oren_nayar, "attenuationmode");
+	oren_nayar_viewID = glGetUniformLocation(program_oren_nayar, "view");
+	oren_nayar_projectionID = glGetUniformLocation(program_oren_nayar, "projection");
+	oren_nayar_lightposID = glGetUniformLocation(program_oren_nayar, "lightpos");
+	oren_nayar_normalmatrixID = glGetUniformLocation(program_oren_nayar, "normalmatrix");
 
 	/* create our sphere and cube objects */
-	baseCube.makeCube();
-	bodyCube.makeCube();
-	headCube.makeCube();
-	rotorSphere.makeSphere(numlats, numlongs);
-	blade1Cube.makeCube();
+	baseCube.makeCube(vec4(0.3, 0.3, 0.28, 1.0));
+	bodyCube.makeCube(vec4(0.6, 0.7, 0.8, 1.0));
+	headCube.makeCube(vec4(0.4, 0.6, 0.9, 1.0));
+	rotorSphere.makeSphere(numlats, numlongs, vec3(0.4, 0.6, 0.9));
+	bladeCube.makeCube(vec4(0.4, 0.6, 0.9, 1.0));
 }
 
 /* Called to update the display. Note that this function is called in the event loop in the wrapper
@@ -172,12 +175,8 @@ void display()
 	/* Clear the colour and frame buffers */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	/* Enable depth test  */
+	/* Enable depth test */
 	glEnable(GL_DEPTH_TEST);
-
-	/* Make the compiled shader program current */
-	glUseProgram(program[current_program]);
-
 
 	// Define our model transformation in a stack and 
 	// push the identity matrix onto the stack
@@ -205,30 +204,39 @@ void display()
 	// Define the light position and transform by the view matrix
 	vec4 lightpos = view * vec4(light_x, light_y, light_z, 1.0);
 
-	// Send our projection and view uniforms to the currently bound shader
-	// I do that here because they are the same for all objects
-	glUniform1ui(colourmodeID[current_program], colourmode);
-	glUniformMatrix4fv(viewID[current_program], 1, GL_FALSE, &view[0][0]);
-	glUniformMatrix4fv(projectionID[current_program], 1, GL_FALSE, &projection[0][0]);
-	glUniform4fv(lightposID[current_program], 1, &lightpos[0]);
-	glUniform1ui(attenuationmodeID[current_program], attenuationmode);
+	// Send the projection and view uniforms to the Phong shader
+	glUseProgram(program_phong);
+	glUniform1ui(phong_colourmodeID, colourmode);
+	glUniformMatrix4fv(phong_viewID, 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(phong_projectionID, 1, GL_FALSE, &projection[0][0]);
+	glUniform4fv(phong_lightposID, 1, &lightpos[0]);
+	glUniform1ui(phong_attenuationmodeID, attenuationmode);
+
+	// Send the projection and view uniforms to the Oren Nayar shader
+	glUseProgram(program_oren_nayar);
+	glUniform1ui(oren_nayar_colourmodeID, colourmode);
+	glUniformMatrix4fv(oren_nayar_viewID, 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(oren_nayar_projectionID, 1, GL_FALSE, &projection[0][0]);
+	glUniform4fv(oren_nayar_lightposID, 1, &lightpos[0]);
+	glUniform1ui(oren_nayar_attenuationmodeID, attenuationmode);
 
 	/* Draw a small sphere in the lightsource position to visually represent the light source */
 	model.push(model.top());
 	{
+		glUseProgram(program_phong);
 		model.top() = translate(model.top(), vec3(light_x, light_y, light_z));
 		model.top() = scale(model.top(), vec3(0.05f, 0.05f, 0.05f)); // make a small sphere
-		// Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
-		glUniformMatrix4fv(modelID[current_program], 1, GL_FALSE, &(model.top()[0][0]));
+		// Recalculate the normal matrix and send the model and normal matrices to the vertex shader
+		glUniformMatrix4fv(phong_modelID, 1, GL_FALSE, &(model.top()[0][0]));
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
-		glUniformMatrix3fv(normalmatrixID[current_program], 1, GL_FALSE, &normalmatrix[0][0]);
+		glUniformMatrix3fv(phong_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our lightposition sphere  with emit mode on*/
+		/* Draw our lightposition sphere with emit mode on*/
 		emitmode = 1;
-		glUniform1ui(emitmodeID[current_program], emitmode);
+		glUniform1ui(phong_emitmodeID, emitmode);
 		rotorSphere.drawSphere(drawmode);
 		emitmode = 0;
-		glUniform1ui(emitmodeID[current_program], emitmode);
+		glUniform1ui(phong_emitmodeID, emitmode);
 	}
 	model.pop();
 
@@ -241,16 +249,17 @@ void display()
 	// This block of code draws the base cube
 	model.push(model.top());
 	{
+		glUseProgram(program_oren_nayar);
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(base_x, base_y, base_z));
 		model.top() = scale(model.top(), vec3(base_scale_x, base_scale_y, base_scale_z));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
-		glUniformMatrix4fv(modelID[current_program], 1, GL_FALSE, &(model.top()[0][0]));
+		glUniformMatrix4fv(oren_nayar_modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
 		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
-		glUniformMatrix3fv(normalmatrixID[current_program], 1, GL_FALSE, &normalmatrix[0][0]);
+		glUniformMatrix3fv(oren_nayar_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
 		baseCube.drawCube(drawmode);
@@ -260,16 +269,17 @@ void display()
 	// This block of code draws the body cube
 	model.push(model.top());
 	{
+		glUseProgram(program_phong);
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(body_x, body_y, body_z));
 		model.top() = scale(model.top(), vec3(body_scale_x, body_scale_y, body_scale_z));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
-		glUniformMatrix4fv(modelID[current_program], 1, GL_FALSE, &(model.top()[0][0]));
+		glUniformMatrix4fv(phong_modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
 		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
-		glUniformMatrix3fv(normalmatrixID[current_program], 1, GL_FALSE, &normalmatrix[0][0]);
+		glUniformMatrix3fv(phong_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
 		bodyCube.drawCube(drawmode);
@@ -279,16 +289,17 @@ void display()
 	// This block of code draws the head cube
 	model.push(model.top());
 	{
+		glUseProgram(program_phong);
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(head_x, head_y, head_z));
 		model.top() = scale(model.top(), vec3(head_scale_x, head_scale_y, head_scale_z));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
-		glUniformMatrix4fv(modelID[current_program], 1, GL_FALSE, &(model.top()[0][0]));
+		glUniformMatrix4fv(phong_modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
 		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
-		glUniformMatrix3fv(normalmatrixID[current_program], 1, GL_FALSE, &normalmatrix[0][0]);
+		glUniformMatrix3fv(phong_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
 		headCube.drawCube(drawmode);
@@ -299,14 +310,15 @@ void display()
 	// This block of code draws the rotor sphere
 	model.push(model.top());
 	{
+		glUseProgram(program_phong);
 		model.top() = translate(model.top(), vec3(rotor_x, rotor_y, rotor_z));
 		model.top() = rotate(model.top(), radians(rotation_z), glm::vec3(0, 0, 1));
 		model.top() = scale(model.top(), vec3(rotor_scale_x, rotor_scale_y, rotor_scale_z));
 
-		// Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
-		glUniformMatrix4fv(modelID[current_program], 1, GL_FALSE, &(model.top()[0][0]));
+		// Recalculate the normal matrix and send the model and normal matrices to the vertex shader
+		glUniformMatrix4fv(phong_modelID, 1, GL_FALSE, &(model.top()[0][0]));
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
-		glUniformMatrix3fv(normalmatrixID[current_program], 1, GL_FALSE, &normalmatrix[0][0]);
+		glUniformMatrix3fv(phong_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
 		rotorSphere.drawSphere(drawmode);
 	}
@@ -315,46 +327,47 @@ void display()
 	// This block of code draws the blade1 cube
 	model.push(model.top());
 	{
+		glUseProgram(program_phong);
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(blade1_x, blade1_y, blade1_z));
 		model.top() = rotate(model.top(), radians(rotation_z), glm::vec3(0, 0, 1));
 		model.top() = scale(model.top(), vec3(blade_scale_x, blade_scale_y, blade_scale_z));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
-		glUniformMatrix4fv(modelID[current_program], 1, GL_FALSE, &(model.top()[0][0]));
+		glUniformMatrix4fv(phong_modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
 		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
-		glUniformMatrix3fv(normalmatrixID[current_program], 1, GL_FALSE, &normalmatrix[0][0]);
+		glUniformMatrix3fv(phong_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
-		blade1Cube.drawCube(drawmode);
+		bladeCube.drawCube(drawmode);
 	}
 	model.pop();
 
 	// This block of code draws the blade2 cube
 	model.push(model.top());
 	{
+		glUseProgram(program_phong);
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(blade2_x, blade2_y, blade2_z));
 		model.top() = rotate(model.top(), radians(90.f + rotation_z), glm::vec3(0, 0, 1));
 		model.top() = scale(model.top(), vec3(blade_scale_x, blade_scale_y, blade_scale_z));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
-		glUniformMatrix4fv(modelID[current_program], 1, GL_FALSE, &(model.top()[0][0]));
+		glUniformMatrix4fv(phong_modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
 		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
-		glUniformMatrix3fv(normalmatrixID[current_program], 1, GL_FALSE, &normalmatrix[0][0]);
+		glUniformMatrix3fv(phong_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
-		blade1Cube.drawCube(drawmode);
+		bladeCube.drawCube(drawmode);
 	}
 	model.pop();
 
 
 	glDisableVertexAttribArray(0);
-	glUseProgram(0);
 
 	/* Modify our animation variables */
 	angle_x += angle_inc_x;
@@ -387,18 +400,12 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == 'Y') angle_inc_z += 0.05f;
 	if (key == 'A') model_scale -= 0.02f;
 	if (key == 'S') model_scale += 0.02f;
-	if (key == 'Z') x -= 0.05f;
-	if (key == 'X') x += 0.05f;
-	if (key == 'C') y -= 0.05f;
-	if (key == 'V') y += 0.05f;
-	if (key == 'B') z -= 0.05f;
-	if (key == 'N') z += 0.05f;
-	if (key == '1') light_x -= 0.05f;
-	if (key == '2') light_x += 0.05f;
-	if (key == '3') light_y -= 0.05f;
-	if (key == '4') light_y += 0.05f;
-	if (key == '5') light_z -= 0.05f;
-	if (key == '6') light_z += 0.05f;
+	if (key == 'Z') light_x -= 0.05f;
+	if (key == 'X') light_x += 0.05f;
+	if (key == 'C') light_y -= 0.05f;
+	if (key == 'V') light_y += 0.05f;
+	if (key == 'B') light_z -= 0.05f;
+	if (key == 'N') light_z += 0.05f;
 	if (key == '7') vx -= 1.f;
 	if (key == '8') vx += 1.f;
 	if (key == '9') vy -= 1.f;
@@ -428,16 +435,7 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 		drawmode++;
 		if (drawmode > 2) drawmode = 0;
 	}
-
-	/* Switch between the vertex lighting shaders and the fragment shader */
-	if (key == 'I' && action != GLFW_PRESS)
-	{
-		current_program++;
-		if (current_program == 3) current_program = 0;
-	}
 }
-
-
 
 /* Entry point of program */
 int main(int argc, char* argv[])

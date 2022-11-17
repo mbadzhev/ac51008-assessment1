@@ -15,7 +15,7 @@ public:
 	Cube();
 	~Cube();
 
-	void makeCube();
+	void makeCube(glm::vec4 vertex_colour);
 	void drawCube(int drawmode);
 
 	// Define vertex buffer object names (e.g as globals)

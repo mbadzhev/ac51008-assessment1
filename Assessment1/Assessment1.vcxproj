@@ -139,11 +139,9 @@
     <ClCompile Include="objects\sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fraglight.frag" />
-    <None Include="shaders\fraglight.vert" />
-    <None Include="shaders\fraglight_oren_nayar.frag" />
-    <None Include="shaders\poslight.frag" />
-    <None Include="shaders\poslight.vert" />
+    <None Include="shaders\oren_nayar.frag" />
+    <None Include="shaders\phong.frag" />
+    <None Include="shaders\phong.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="objects\cube.h" />

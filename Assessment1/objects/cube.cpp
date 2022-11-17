@@ -28,7 +28,7 @@ Cube::~Cube()
 
 
 /* Make a cube from hard-coded vertex positions and normals  */
-void Cube::makeCube()
+void Cube::makeCube(glm::vec4 vertex_colour)
 {
 	/* Define vertices for a cube in 12 triangles */
 	GLfloat vertexPositions[] =
@@ -83,49 +83,11 @@ void Cube::makeCube()
 	};
 
 	/* Manually specified colours for our cube */
-	float vertexColours[] = {
-		0.0f, 0.0f, 1.0f, 1.0f,
-		0.0f, 0.0f, 1.0f, 1.0f,
-		0.0f, 0.0f, 1.0f, 1.0f,
-		0.0f, 0.0f, 1.0f, 1.0f,
-		0.0f, 0.0f, 1.0f, 1.0f,
-		0.0f, 0.0f, 1.0f, 1.0f,
-
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
-
-		1.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f, 1.0f,
-
-		1.0f, 0.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 0.0f, 1.0f,
-
-		1.0f, 0.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 1.0f,
-
-		0.0f, 1.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f, 1.0f,
-	};
+	glm::vec4 vertexColours[36];
+	for (size_t i = 0; i < 36; i++)
+	{
+		vertexColours[i] = vertex_colour;
+	}
 
 	/* Manually specified normals for our cube */
 	GLfloat normals[] =
