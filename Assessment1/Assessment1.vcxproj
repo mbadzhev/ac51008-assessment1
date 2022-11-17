@@ -139,7 +139,7 @@
     <ClCompile Include="objects\sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fraglight_oren_nayar.frag" />
+    <None Include="shaders\oren_nayar.frag" />
     <None Include="shaders\phong.frag" />
     <None Include="shaders\phong.vert" />
   </ItemGroup>
