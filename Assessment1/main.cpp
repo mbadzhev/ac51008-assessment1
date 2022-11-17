@@ -39,7 +39,7 @@ GLuint emitmode;
 GLuint attenuationmode;
 
 /* Position and view globals */
-GLfloat angle_x, angle_inc_x, x, model_scale, z, y, vx, vy, vz;
+GLfloat angle_x, angle_inc_x, model_scale, vx, vy, vz;
 GLfloat angle_y, angle_inc_y, angle_z, angle_inc_z;
 GLuint drawmode;			// Defines drawing mode of sphere as points, lines or filled polygons
 GLuint numlats, numlongs;	//Define the resolution of the sphere object
@@ -89,11 +89,8 @@ Use it for all your initialisation stuff
 void init(GLWrapper* glw)
 {
 	/* Set the object transformation controls to their initial values */
-	x = 0.05f;
-	y = 0;
-	z = 0;
 	vx = 0; vx = 0, vz = 4.f;
-	light_x = 0; light_y = 0; light_z = 0;
+	light_x = 2; light_y = 2; light_z = 2;
 	angle_x = angle_y = angle_z = 0;
 	angle_inc_x = angle_inc_y = angle_inc_z = 0; const float roughness = 0.8;
 	model_scale = 1.f;
@@ -399,22 +396,16 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == 'W') angle_inc_x += 0.05f;
 	if (key == 'E') angle_inc_y -= 0.05f;
 	if (key == 'R') angle_inc_y += 0.05f;
-	if (key == 'T') angle_inc_z -= 0.05f;
+	if (key == 'A') angle_inc_z -= 0.05f;
 	if (key == 'Y') angle_inc_z += 0.05f;
 	if (key == 'A') model_scale -= 0.02f;
 	if (key == 'S') model_scale += 0.02f;
-	if (key == 'Z') x -= 0.05f;
-	if (key == 'X') x += 0.05f;
-	if (key == 'C') y -= 0.05f;
-	if (key == 'V') y += 0.05f;
-	if (key == 'B') z -= 0.05f;
-	if (key == 'N') z += 0.05f;
-	if (key == '1') light_x -= 0.05f;
-	if (key == '2') light_x += 0.05f;
-	if (key == '3') light_y -= 0.05f;
-	if (key == '4') light_y += 0.05f;
-	if (key == '5') light_z -= 0.05f;
-	if (key == '6') light_z += 0.05f;
+	if (key == 'Z') light_x -= 0.05f;
+	if (key == 'X') light_x += 0.05f;
+	if (key == 'C') light_y -= 0.05f;
+	if (key == 'V') light_y += 0.05f;
+	if (key == 'B') light_z -= 0.05f;
+	if (key == 'N') light_z += 0.05f;
 	if (key == '7') vx -= 1.f;
 	if (key == '8') vx += 1.f;
 	if (key == '9') vy -= 1.f;
