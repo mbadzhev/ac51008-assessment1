@@ -27,10 +27,10 @@ void main()
 	vec3 light_position = lightpos.xyz;
 
 	// Switch the vertex colour based on the colourmode
-	if (colourmode == 1)
+	if (colourmode != 1)
 		vs_diffuse_colour = colour;
 	else
-		vs_diffuse_colour = vec4(0.95, 0.9, 0.85, 1.0);
+		vs_diffuse_colour = vec4(1.0, 1.0, 1.0, 1.0);
 
 	/* Define vectors for calculating diffuse and specular lighting */
 	// Calculate the model-view transformation

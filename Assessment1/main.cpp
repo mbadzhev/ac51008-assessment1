@@ -158,11 +158,11 @@ void init(GLWrapper* glw)
 	oren_nayar_normalmatrixID = glGetUniformLocation(program_oren_nayar, "normalmatrix");
 
 	/* create our sphere and cube objects */
-	baseCube.makeCube();
-	bodyCube.makeCube();
-	headCube.makeCube();
-	rotorSphere.makeSphere(numlats, numlongs);
-	bladeCube.makeCube();
+	baseCube.makeCube(vec4(0.3, 0.3, 0.28, 1.0));
+	bodyCube.makeCube(vec4(0.6, 0.7, 0.8, 1.0));
+	headCube.makeCube(vec4(0.4, 0.6, 0.9, 1.0));
+	rotorSphere.makeSphere(numlats, numlongs, vec3(0.4, 0.6, 0.9));
+	bladeCube.makeCube(vec4(0.4, 0.6, 0.9, 1.0));
 }
 
 /* Called to update the display. Note that this function is called in the event loop in the wrapper
@@ -396,7 +396,7 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == 'W') angle_inc_x += 0.05f;
 	if (key == 'E') angle_inc_y -= 0.05f;
 	if (key == 'R') angle_inc_y += 0.05f;
-	if (key == 'A') angle_inc_z -= 0.05f;
+	if (key == 'T') angle_inc_z -= 0.05f;
 	if (key == 'Y') angle_inc_z += 0.05f;
 	if (key == 'A') model_scale -= 0.02f;
 	if (key == 'S') model_scale += 0.02f;
