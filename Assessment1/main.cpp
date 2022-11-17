@@ -46,6 +46,9 @@ GLuint numlats, numlongs;	//Define the resolution of the sphere object
 
 GLfloat light_x, light_y, light_z;
 
+// Camera coordinates (x,y,z)
+GLfloat camera_x, camera_y, camera_z;
+
 /* Uniforms*/
 GLuint phong_modelID, phong_viewID, phong_projectionID, phong_lightposID, phong_normalmatrixID;
 GLuint phong_colourmodeID, phong_emitmodeID, phong_attenuationmodeID;
@@ -89,7 +92,7 @@ Use it for all your initialisation stuff
 void init(GLWrapper* glw)
 {
 	/* Set the object transformation controls to their initial values */
-	vx = 0; vx = 0, vz = 4.f;
+	vx = 0; vx = 0, vz = 0;
 	light_x = 2; light_y = 2; light_z = 2;
 	angle_x = angle_y = angle_z = 0;
 	angle_inc_x = angle_inc_y = angle_inc_z = 0; const float roughness = 0.8;
@@ -100,6 +103,8 @@ void init(GLWrapper* glw)
 	attenuationmode = 1; // Attenuation is on by default
 	numlats = 40;		// Number of latitudes in our sphere
 	numlongs = 40;		// Number of longitudes in our sphere
+
+	camera_x = 0; camera_y = 1; camera_z = 5;
 
 	base_x = 0; base_y = 0; base_z = 0;
 	body_x = 0; body_y = 0.5f; body_z = 0;
@@ -191,9 +196,12 @@ void display()
 
 	// Camera matrix
 	mat4 view = lookAt(
-		vec3(0, 3, 5), // Camera is at (0,0,4), in World Space
-		vec3(0, 0, 0), // and looks at the origin
-		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+		// Camera position
+		vec3(camera_x, camera_y, camera_z),
+		// Camera looks at the origin
+		vec3(0, 0, 0),
+		// Head is up (set to 0,-1,0 to look upside-down)
+		vec3(0, 1, 0) 
 	);
 
 	// Apply rotations to the view position. This wil get applied to the whole scene
@@ -387,7 +395,7 @@ static void reshape(GLFWwindow* window, int w, int h)
 static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods)
 {
 	/* Enable this call if you want to disable key responses to a held down key*/
-//	if (action != GLFW_PRESS) return;
+	//if (action != GLFW_PRESS) return;
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -400,18 +408,22 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == 'Y') angle_inc_z += 0.05f;
 	if (key == 'A') model_scale -= 0.02f;
 	if (key == 'S') model_scale += 0.02f;
+
+	// Light controls
 	if (key == 'Z') light_x -= 0.05f;
 	if (key == 'X') light_x += 0.05f;
 	if (key == 'C') light_y -= 0.05f;
 	if (key == 'V') light_y += 0.05f;
 	if (key == 'B') light_z -= 0.05f;
 	if (key == 'N') light_z += 0.05f;
-	if (key == '7') vx -= 1.f;
-	if (key == '8') vx += 1.f;
-	if (key == '9') vy -= 1.f;
-	if (key == '0') vy += 1.f;
-	if (key == 'O') vz -= 1.f;
-	if (key == 'P') vz += 1.f;
+
+	// Camera controls
+	if (key == GLFW_KEY_UP) vx -= 1.f;
+	if (key == GLFW_KEY_DOWN) vx += 1.f;
+	if (key == GLFW_KEY_LEFT) vy -= 1.f;
+	if (key == GLFW_KEY_RIGHT) vy += 1.f;
+	if ((key == GLFW_KEY_EQUAL || key == GLFW_KEY_KP_ADD) && camera_z > 1.f) camera_z -= 0.5f;
+	if ((key == GLFW_KEY_MINUS || key == GLFW_KEY_KP_SUBTRACT) && camera_z < 15.f) camera_z += 0.5f;
 
 	/* Control rotor and blade rotation */
 	if (key == 'L') rotation_inc_z -= 0.1f;
