@@ -48,8 +48,9 @@ Cylinder::~Cylinder()
 {
 }
 
-void Cylinder::makeCylinder()
+void Cylinder::makeCylinder(vec3 vertex_colour)
 {
+	colour = vertex_colour;
 	defineVertices();
 
 	GLuint pindices[406]; //204 //201

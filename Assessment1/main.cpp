@@ -21,6 +21,7 @@ if you prefer */
 // Include headers for our objects
 #include "objects/sphere.h"
 #include "objects/cube.h"
+#include "objects/cylinder.h"
 #include "objects/blade.h"
 
 using namespace std;
@@ -62,7 +63,7 @@ GLuint numspherevertices;
 
 /* Primitive objects */
 Cube baseCube;
-Cube bodyCube;
+Cylinder tower;
 Cube headCube;
 Sphere rotorSphere;
 Blade blade;
@@ -70,13 +71,13 @@ Blade blade;
 /* Position of primitives */
 GLfloat origin_x, origin_y, origin_z;
 GLfloat base_x, base_y, base_z;
-GLfloat body_x, body_y, body_z;
+GLfloat tower_x, tower_y, tower_z;
 GLfloat head_x, head_y, head_z;
 GLfloat rotor_x, rotor_y, rotor_z;
 
 /* Scale of primitives */
 GLfloat base_scale_x, base_scale_y, base_scale_z;
-GLfloat body_scale_x, body_scale_y, body_scale_z;
+GLfloat tower_scale_x, tower_scale_y, tower_scale_z;
 GLfloat head_scale_x, head_scale_y, head_scale_z;
 GLfloat rotor_scale_x, rotor_scale_y, rotor_scale_z;
 GLfloat blade_scale_x, blade_scale_y, blade_scale_z;
@@ -110,10 +111,10 @@ void init(GLWrapper* glw)
 	head_x = 0; head_y = 0; head_z = 0;
 	rotor_x = 0; rotor_y = 0; rotor_z = 0.25f;
 	base_x = 0; base_y = -1.f; base_z = 0;
-	body_x = 0; body_y = -0.5f; body_z = 0;
-	
-	base_scale_x = 1.f; base_scale_y = 0.1f; base_scale_z = 1.f;
-	body_scale_x = 0.5f; body_scale_y = 2.f; body_scale_z = 0.5f;
+	tower_x = 0; tower_y = -0.5f; tower_z = 0;
+
+	base_scale_x = 1.f; base_scale_y = 0.2f; base_scale_z = 1.f;
+	tower_scale_x = 0.1f; tower_scale_y = 1.f; tower_scale_z = 0.1f;
 	head_scale_x = 0.6f; head_scale_y = 0.5f; head_scale_z = 0.9f;
 	rotor_scale_x = 0.12f; rotor_scale_y = 0.12f; rotor_scale_z = 0.2f;
 	blade_scale_x = 0.15f; blade_scale_y = 2.f; blade_scale_z = 0.05f;
@@ -163,7 +164,7 @@ void init(GLWrapper* glw)
 
 	/* create our sphere and cube objects */
 	baseCube.makeCube(vec4(0.3, 0.3, 0.28, 1.0));
-	bodyCube.makeCube(vec4(0.6, 0.7, 0.8, 1.0));
+	tower.makeCylinder(vec3(0.4, 0.6, 0.9));
 	headCube.makeCube(vec4(0.4, 0.6, 0.9, 1.0));
 	rotorSphere.makeSphere(numlats, numlongs, vec3(0.4, 0.6, 0.9));
 	blade.makeBlade(vec4(0.4, 0.6, 0.9, 1.0));
@@ -252,7 +253,7 @@ void display()
 	model.top() = rotate(model.top(), -radians(angle_x), glm::vec3(1, 0, 0)); //rotating in clockwise direction around x-axis
 	model.top() = rotate(model.top(), -radians(angle_y), glm::vec3(0, 1, 0)); //rotating in clockwise direction around y-axis
 	model.top() = rotate(model.top(), -radians(angle_z), glm::vec3(0, 0, 1)); //rotating in clockwise direction around z-axis
-	
+
 	// This block of code draws the base cube
 	model.push(model.top());
 	{
@@ -273,13 +274,13 @@ void display()
 	}
 	model.pop();
 
-	// This block of code draws the body cube
+	// This block of code draws the tower cube
 	model.push(model.top());
 	{
 		glUseProgram(program_phong);
-		// Define the model transformations for the cube
-		model.top() = translate(model.top(), vec3(body_x, body_y, body_z));
-		model.top() = scale(model.top(), vec3(body_scale_x, body_scale_y, body_scale_z));
+		// Define the model transformations for the cylinder
+		model.top() = translate(model.top(), vec3(tower_x, tower_y, tower_z));
+		model.top() = scale(model.top(), vec3(tower_scale_x, tower_scale_y, tower_scale_z));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
 		glUniformMatrix4fv(phong_modelID, 1, GL_FALSE, &(model.top()[0][0]));
@@ -288,8 +289,8 @@ void display()
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
 		glUniformMatrix3fv(phong_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our cube*/
-		bodyCube.drawCube(drawmode);
+		/* Draw our cylinder */
+		tower.drawCylinder(drawmode);
 	}
 	model.pop();
 

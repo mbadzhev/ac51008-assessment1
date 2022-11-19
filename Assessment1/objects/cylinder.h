@@ -33,7 +33,7 @@ public:
 	Cylinder();
 	Cylinder(glm::vec3 c);
 	~Cylinder();
-	void makeCylinder();
+	void makeCylinder(glm::vec3 vertex_colour);
 	void drawCylinder(int drawmode);
 };
 
