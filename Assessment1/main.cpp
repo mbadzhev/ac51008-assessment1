@@ -21,6 +21,7 @@ if you prefer */
 // Include headers for our objects
 #include "objects/sphere.h"
 #include "objects/cube.h"
+#include "objects/blade.h"
 
 using namespace std;
 using namespace glm;
@@ -64,15 +65,14 @@ Cube baseCube;
 Cube bodyCube;
 Cube headCube;
 Sphere rotorSphere;
-Cube bladeCube;
+Blade blade;
 
 /* Position of primitives */
+GLfloat origin_x, origin_y, origin_z;
 GLfloat base_x, base_y, base_z;
 GLfloat body_x, body_y, body_z;
 GLfloat head_x, head_y, head_z;
 GLfloat rotor_x, rotor_y, rotor_z;
-GLfloat blade1_x, blade1_y, blade1_z;
-GLfloat blade2_x, blade2_y, blade2_z;
 
 /* Scale of primitives */
 GLfloat base_scale_x, base_scale_y, base_scale_z;
@@ -106,13 +106,12 @@ void init(GLWrapper* glw)
 
 	camera_x = 0; camera_y = 1; camera_z = 5;
 
-	base_x = 0; base_y = 0; base_z = 0;
-	body_x = 0; body_y = 0.5f; body_z = 0;
-	head_x = 0; head_y = 1.f; head_z = 0;
-	rotor_x = 0; rotor_y = 1.f; rotor_z = 0.25f;
-	blade1_x = 0; blade1_y = 1.f; blade1_z = 0.3f;
-	blade2_x = 0; blade2_y = 1.f; blade2_z = 0.3;
-
+	origin_x = 0; origin_y = 0; origin_z = 0;
+	head_x = 0; head_y = 0; head_z = 0;
+	rotor_x = 0; rotor_y = 0; rotor_z = 0.25f;
+	base_x = 0; base_y = -1.f; base_z = 0;
+	body_x = 0; body_y = -0.5f; body_z = 0;
+	
 	base_scale_x = 1.f; base_scale_y = 0.1f; base_scale_z = 1.f;
 	body_scale_x = 0.5f; body_scale_y = 2.f; body_scale_z = 0.5f;
 	head_scale_x = 0.6f; head_scale_y = 0.5f; head_scale_z = 0.9f;
@@ -167,7 +166,7 @@ void init(GLWrapper* glw)
 	bodyCube.makeCube(vec4(0.6, 0.7, 0.8, 1.0));
 	headCube.makeCube(vec4(0.4, 0.6, 0.9, 1.0));
 	rotorSphere.makeSphere(numlats, numlongs, vec3(0.4, 0.6, 0.9));
-	bladeCube.makeCube(vec4(0.4, 0.6, 0.9, 1.0));
+	blade.makeBlade(vec4(0.4, 0.6, 0.9, 1.0));
 }
 
 /* Called to update the display. Note that this function is called in the event loop in the wrapper
@@ -201,7 +200,7 @@ void display()
 		// Camera looks at the origin
 		vec3(0, 0, 0),
 		// Head is up (set to 0,-1,0 to look upside-down)
-		vec3(0, 1, 0) 
+		vec3(0, 1, 0)
 	);
 
 	// Apply rotations to the view position. This wil get applied to the whole scene
@@ -253,7 +252,7 @@ void display()
 	model.top() = rotate(model.top(), -radians(angle_x), glm::vec3(1, 0, 0)); //rotating in clockwise direction around x-axis
 	model.top() = rotate(model.top(), -radians(angle_y), glm::vec3(0, 1, 0)); //rotating in clockwise direction around y-axis
 	model.top() = rotate(model.top(), -radians(angle_z), glm::vec3(0, 0, 1)); //rotating in clockwise direction around z-axis
-
+	
 	// This block of code draws the base cube
 	model.push(model.top());
 	{
@@ -332,48 +331,68 @@ void display()
 	}
 	model.pop();
 
-	// This block of code draws the blade1 cube
+	// This block of code draws the blade
 	model.push(model.top());
 	{
 		glUseProgram(program_phong);
-		// Define the model transformations for the cube
-		model.top() = translate(model.top(), vec3(blade1_x, blade1_y, blade1_z));
+		// Transformations for the blade
 		model.top() = rotate(model.top(), radians(rotation_z), glm::vec3(0, 0, 1));
-		model.top() = scale(model.top(), vec3(blade_scale_x, blade_scale_y, blade_scale_z));
+		model.top() = translate(model.top(), vec3(origin_x, origin_y + 0.1f, origin_z + 0.26f));
+		model.top() = scale(model.top(), vec3(model_scale, model_scale, model_scale));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
-		glUniformMatrix4fv(phong_modelID, 1, GL_FALSE, &(model.top()[0][0]));
+		glUniformMatrix4fv(oren_nayar_modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
 		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
-		glUniformMatrix3fv(phong_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+		glUniformMatrix3fv(oren_nayar_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our cube*/
-		bladeCube.drawCube(drawmode);
+		/* Draw our blade*/
+		blade.drawBlade(drawmode);
 	}
 	model.pop();
 
-	// This block of code draws the blade2 cube
+	// This block of code draws the blade
 	model.push(model.top());
 	{
 		glUseProgram(program_phong);
-		// Define the model transformations for the cube
-		model.top() = translate(model.top(), vec3(blade2_x, blade2_y, blade2_z));
-		model.top() = rotate(model.top(), radians(90.f + rotation_z), glm::vec3(0, 0, 1));
-		model.top() = scale(model.top(), vec3(blade_scale_x, blade_scale_y, blade_scale_z));
+		// Transformations for the blade
+		model.top() = rotate(model.top(), radians(120.f + rotation_z), glm::vec3(0, 0, 1));
+		model.top() = translate(model.top(), vec3(origin_x, origin_y + 0.1f, origin_z + 0.26f));
+		model.top() = scale(model.top(), vec3(model_scale, model_scale, model_scale));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
-		glUniformMatrix4fv(phong_modelID, 1, GL_FALSE, &(model.top()[0][0]));
+		glUniformMatrix4fv(oren_nayar_modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
 		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
-		glUniformMatrix3fv(phong_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+		glUniformMatrix3fv(oren_nayar_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our cube*/
-		bladeCube.drawCube(drawmode);
+		/* Draw our blade*/
+		blade.drawBlade(drawmode);
 	}
 	model.pop();
 
+	// This block of code draws the blade
+	model.push(model.top());
+	{
+		glUseProgram(program_phong);
+		// Transformations for the blade
+		model.top() = rotate(model.top(), radians(240.f + rotation_z), glm::vec3(0, 0, 1));
+		model.top() = translate(model.top(), vec3(origin_x, origin_y + 0.1f, origin_z + 0.26f));
+		model.top() = scale(model.top(), vec3(model_scale, model_scale, model_scale));
+
+		// Send the model uniform and normal matrix to the currently bound shader,
+		glUniformMatrix4fv(oren_nayar_modelID, 1, GL_FALSE, &(model.top()[0][0]));
+
+		// Recalculate the normal matrix and send to the vertex shader
+		normalmatrix = transpose(inverse(mat3(view * model.top())));
+		glUniformMatrix3fv(oren_nayar_normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+
+		/* Draw our blade*/
+		blade.drawBlade(drawmode);
+	}
+	model.pop();
 
 	glDisableVertexAttribArray(0);
 
