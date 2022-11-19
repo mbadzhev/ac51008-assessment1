@@ -85,6 +85,7 @@ GLfloat blade_scale_x, blade_scale_y, blade_scale_z;
 /* Rotation of primitives */
 GLfloat rotation_z;
 GLfloat rotation_inc_z;
+GLfloat rotation_y;
 
 /*
 This function is called before entering the main rendering loop.
@@ -121,6 +122,7 @@ void init(GLWrapper* glw)
 
 	rotation_z = 0;
 	rotation_inc_z = 0;
+	rotation_y = 0;
 
 	// Generate index (name) for one vertex array object
 	glGenVertexArrays(1, &vao);
@@ -300,6 +302,7 @@ void display()
 		glUseProgram(program_phong);
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(body_x, body_y, body_z));
+		model.top() = rotate(model.top(), radians(rotation_y), glm::vec3(0, 1, 0));
 		model.top() = scale(model.top(), vec3(body_scale_x, body_scale_y, body_scale_z));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
@@ -319,8 +322,9 @@ void display()
 	model.push(model.top());
 	{
 		glUseProgram(program_phong);
-		model.top() = translate(model.top(), vec3(rotor_x, rotor_y, rotor_z));
+		model.top() = rotate(model.top(), radians(rotation_y), glm::vec3(0, 1, 0));
 		model.top() = rotate(model.top(), radians(rotation_z), glm::vec3(0, 0, 1));
+		model.top() = translate(model.top(), vec3(rotor_x, rotor_y, rotor_z));
 		model.top() = scale(model.top(), vec3(rotor_scale_x, rotor_scale_y, rotor_scale_z));
 
 		// Recalculate the normal matrix and send the model and normal matrices to the vertex shader
@@ -337,6 +341,7 @@ void display()
 	{
 		glUseProgram(program_phong);
 		// Transformations for the blade
+		model.top() = rotate(model.top(), radians(rotation_y), glm::vec3(0, 1, 0));
 		model.top() = rotate(model.top(), radians(rotation_z), glm::vec3(0, 0, 1));
 		model.top() = translate(model.top(), vec3(origin_x, origin_y + 0.1f, origin_z + 0.26f));
 		model.top() = scale(model.top(), vec3(model_scale, model_scale, model_scale));
@@ -358,6 +363,7 @@ void display()
 	{
 		glUseProgram(program_phong);
 		// Transformations for the blade
+		model.top() = rotate(model.top(), radians(rotation_y), glm::vec3(0, 1, 0));
 		model.top() = rotate(model.top(), radians(120.f + rotation_z), glm::vec3(0, 0, 1));
 		model.top() = translate(model.top(), vec3(origin_x, origin_y + 0.1f, origin_z + 0.26f));
 		model.top() = scale(model.top(), vec3(model_scale, model_scale, model_scale));
@@ -379,6 +385,7 @@ void display()
 	{
 		glUseProgram(program_phong);
 		// Transformations for the blade
+		model.top() = rotate(model.top(), radians(rotation_y), glm::vec3(0, 1, 0));
 		model.top() = rotate(model.top(), radians(240.f + rotation_z), glm::vec3(0, 0, 1));
 		model.top() = translate(model.top(), vec3(origin_x, origin_y + 0.1f, origin_z + 0.26f));
 		model.top() = scale(model.top(), vec3(model_scale, model_scale, model_scale));
@@ -448,6 +455,10 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	/* Control rotor and blade rotation */
 	if (key == 'L') rotation_inc_z -= 0.1f;
 	if (key == 'K') rotation_inc_z += 0.1f;
+	
+	/* Control body rotation */
+	if (key == 'H' && rotation_y > -15) rotation_y -= 0.5f;
+	if (key == 'J' && rotation_y < 15) rotation_y += 0.5f;
 
 	/* Switch colour mode */
 	if (key == 'M' && action != GLFW_PRESS)
@@ -471,13 +482,19 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 
 void displayControls()
 {
-	cout << "Camera Controls" << endl;
+	cout << "\nCamera Controls" << endl;
 	cout << "Rotate Camera Right: right arrow" << endl;
 	cout << "Rotate Camera Left: left arrow" << endl;
 	cout << "Move Camera Up: up arrow" << endl;
 	cout << "Move Camera Down: down arrow" << endl;
 	cout << "Zoom Camera In: plus" << endl;
 	cout << "Zoom Camera Out: minus" << endl;
+
+	cout << "\nModel Controls" << endl;
+	cout << "Rotate Blades Right: L" << endl;
+	cout << "Rotate Blades Left: K" << endl;
+	cout << "Rotate Body Right: H" << endl;
+	cout << "Rotate Body Left: J" << endl;
 }
 
 /* Entry point of program */
