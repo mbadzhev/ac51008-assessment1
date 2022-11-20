@@ -134,6 +134,7 @@
     <ClCompile Include="..\common\glad.c" />
     <ClCompile Include="..\common\wrapper_glfw.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="objects\blade.cpp" />
     <ClCompile Include="objects\cube.cpp" />
     <ClCompile Include="objects\cylinder.cpp" />
     <ClCompile Include="objects\sphere.cpp" />
@@ -144,6 +145,7 @@
     <None Include="shaders\phong.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="objects\blade.h" />
     <ClInclude Include="objects\cube.h" />
     <ClInclude Include="objects\cylinder.h" />
     <ClInclude Include="objects\sphere.h" />
