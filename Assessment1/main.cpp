@@ -38,7 +38,6 @@ GLuint colourmode;	/* Index of a uniform to switch the colour mode in the vertex
 					  I've included this to show you how to pass in an unsigned integer into
 					  your vertex shader. */
 GLuint emitmode;
-GLuint attenuationmode;
 
 /* Position and view globals */
 GLfloat angle_x, angle_inc_x, model_scale, vx, vy, vz;
@@ -53,10 +52,10 @@ GLfloat camera_x, camera_y, camera_z;
 
 /* Uniforms*/
 GLuint phong_modelID, phong_viewID, phong_projectionID, phong_lightposID, phong_normalmatrixID;
-GLuint phong_colourmodeID, phong_emitmodeID, phong_attenuationmodeID;
+GLuint phong_colourmodeID, phong_emitmodeID;
 /* Uniforms*/
 GLuint oren_nayar_modelID, oren_nayar_viewID, oren_nayar_projectionID, oren_nayar_lightposID, oren_nayar_normalmatrixID;
-GLuint oren_nayar_colourmodeID, oren_nayar_emitmodeID, oren_nayar_attenuationmodeID;
+GLuint oren_nayar_colourmodeID, oren_nayar_emitmodeID;
 
 GLfloat aspect_ratio;		/* Aspect ratio of the window defined in the reshape callback*/
 GLuint numspherevertices;
@@ -102,7 +101,6 @@ void init(GLWrapper* glw)
 	aspect_ratio = 1.3333f;
 	colourmode = 0;
 	emitmode = 0;
-	attenuationmode = 1; // Attenuation is on by default
 	numlats = 40;		// Number of latitudes in our sphere
 	numlongs = 40;		// Number of longitudes in our sphere
 
@@ -148,7 +146,6 @@ void init(GLWrapper* glw)
 	phong_modelID = glGetUniformLocation(program_phong, "model");
 	phong_colourmodeID = glGetUniformLocation(program_phong, "colourmode");
 	phong_emitmodeID = glGetUniformLocation(program_phong, "emitmode");
-	phong_attenuationmodeID = glGetUniformLocation(program_phong, "attenuationmode");
 	phong_viewID = glGetUniformLocation(program_phong, "view");
 	phong_projectionID = glGetUniformLocation(program_phong, "projection");
 	phong_lightposID = glGetUniformLocation(program_phong, "lightpos");
@@ -158,7 +155,6 @@ void init(GLWrapper* glw)
 	oren_nayar_modelID = glGetUniformLocation(program_oren_nayar, "model");
 	oren_nayar_colourmodeID = glGetUniformLocation(program_oren_nayar, "colourmode");
 	oren_nayar_emitmodeID = glGetUniformLocation(program_oren_nayar, "emitmode");
-	oren_nayar_attenuationmodeID = glGetUniformLocation(program_oren_nayar, "attenuationmode");
 	oren_nayar_viewID = glGetUniformLocation(program_oren_nayar, "view");
 	oren_nayar_projectionID = glGetUniformLocation(program_oren_nayar, "projection");
 	oren_nayar_lightposID = glGetUniformLocation(program_oren_nayar, "lightpos");
@@ -220,7 +216,6 @@ void display()
 	glUniformMatrix4fv(phong_viewID, 1, GL_FALSE, &view[0][0]);
 	glUniformMatrix4fv(phong_projectionID, 1, GL_FALSE, &projection[0][0]);
 	glUniform4fv(phong_lightposID, 1, &lightpos[0]);
-	glUniform1ui(phong_attenuationmodeID, attenuationmode);
 
 	// Send the projection and view uniforms to the Oren Nayar shader
 	glUseProgram(program_oren_nayar);
@@ -228,7 +223,6 @@ void display()
 	glUniformMatrix4fv(oren_nayar_viewID, 1, GL_FALSE, &view[0][0]);
 	glUniformMatrix4fv(oren_nayar_projectionID, 1, GL_FALSE, &projection[0][0]);
 	glUniform4fv(oren_nayar_lightposID, 1, &lightpos[0]);
-	glUniform1ui(oren_nayar_attenuationmodeID, attenuationmode);
 
 	/* Draw a small sphere in the lightsource position to visually represent the light source */
 	model.push(model.top());
@@ -464,12 +458,6 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == 'M' && action != GLFW_PRESS)
 	{
 		colourmode = !colourmode;
-	}
-
-	/* Turn attenuation on and off */
-	if (key == '.' && action != GLFW_PRESS)
-	{
-		attenuationmode = !attenuationmode;
 	}
 
 	/* Cycle between drawing vertices, mesh and filled polygons */
