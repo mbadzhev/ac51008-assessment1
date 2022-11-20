@@ -483,18 +483,38 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 void displayControls()
 {
 	cout << "\nCamera Controls" << endl;
-	cout << "Rotate Camera Right: right arrow" << endl;
-	cout << "Rotate Camera Left: left arrow" << endl;
-	cout << "Move Camera Up: up arrow" << endl;
-	cout << "Move Camera Down: down arrow" << endl;
-	cout << "Zoom Camera In: plus" << endl;
-	cout << "Zoom Camera Out: minus" << endl;
+	cout << "Rotate Camera Right: RIGHT ARROW" << endl;
+	cout << "Rotate Camera Left: LEFT ARROW" << endl;
+	cout << "Move Camera Up: UP ARROW" << endl;
+	cout << "Move Camera Down: DOWN ARROW" << endl;
+	cout << "Zoom Camera In: -" << endl;
+	cout << "Zoom Camera Out: +" << endl;
 
-	cout << "\nModel Controls" << endl;
+	cout << "\nLight Controls" << endl;
+	cout << "Move Light Left: Z" << endl;
+	cout << "Move Light Right: X" << endl;
+	cout << "Move Light Down: C" << endl;
+	cout << "Move Light Up: V" << endl;
+	cout << "Move Light Forward: B" << endl;
+	cout << "Move Light Back: N" << endl;
+
+	cout << "\nModel Movement Controls" << endl;
 	cout << "Rotate Blades Right: L" << endl;
 	cout << "Rotate Blades Left: K" << endl;
 	cout << "Rotate Body Right: H" << endl;
 	cout << "Rotate Body Left: J" << endl;
+
+	cout << "\nModel Transformation Controls" << endl;
+	cout << "Rotate Model Down: Q" << endl;
+	cout << "Rotate Model Up: W" << endl;
+	cout << "Rotate Model Forward: E" << endl;
+	cout << "Rotate Model Back: R" << endl;
+	cout << "Rotate Model Left: T" << endl;
+	cout << "Rotate Model Right: Y" << endl;
+
+	cout << "\nMiscellaneous Controls" << endl;
+	cout << "Switch Colour: M" << endl;
+	cout << "Switch vertices, mesh and filled polygons: ," << endl;
 }
 
 /* Entry point of program */
